@@ -52,7 +52,23 @@ function getServer() {
           isError: true,
         };
       }
-      return { content: [{ type: "text", text }] };
+
+      const TEXT_PREVIEW_LENGTH = 400;
+      let body;
+      try {
+        body = JSON.parse(text);
+      } catch {
+        return { content: [{ type: "text", text }] };
+      }
+      if (Array.isArray(body.data)) {
+        for (const item of body.data) {
+          const fullText = item?.attributes?.text;
+          if (typeof fullText === "string" && fullText.length > TEXT_PREVIEW_LENGTH) {
+            item.attributes.text = `${fullText.slice(0, TEXT_PREVIEW_LENGTH)}... [truncated; call get_notice with this notice's id for full text]`;
+          }
+        }
+      }
+      return { content: [{ type: "text", text: JSON.stringify(body) }] };
     }
   );
 
