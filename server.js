@@ -11,6 +11,25 @@ if (!NICHEDATA_TOKEN) {
   console.warn("Warning: NICHEDATA_TOKEN is not set. Notice tool calls will fail until it is configured.");
 }
 
+const SUMMARY_FIELDS = [
+  "_id",
+  "date",
+  "fullName",
+  "firstName",
+  "lastName",
+  "address",
+  "street",
+  "city",
+  "state",
+  "zipCode",
+  "county",
+  "dateOfSale",
+  "recordType",
+  "saleStatus",
+  "createdAt",
+  "updatedAt",
+];
+
 function authHeaders() {
   return {
     Authorization: `Bearer ${NICHEDATA_TOKEN}`,
@@ -25,7 +44,8 @@ function getServer() {
     "list_notices",
     {
       title: "List notices",
-      description: "List NicheData notices with optional filtering, sorting, and pagination.",
+      description:
+        "List NicheData notices with optional filtering, sorting, and pagination. Returns a lightweight summary per notice (name, address, dates, record type) — use get_notice with a notice's id for full details including the notice text and enriched owner/property/family data.",
       inputSchema: {
         page: z.number().int().min(1).optional().describe("Page number, 1-indexed"),
         limit: z.number().int().min(1).max(100).optional().describe("Results per page"),
@@ -53,7 +73,6 @@ function getServer() {
         };
       }
 
-      const TEXT_PREVIEW_LENGTH = 400;
       let body;
       try {
         body = JSON.parse(text);
@@ -62,9 +81,12 @@ function getServer() {
       }
       if (Array.isArray(body.data)) {
         for (const item of body.data) {
-          const fullText = item?.attributes?.text;
-          if (typeof fullText === "string" && fullText.length > TEXT_PREVIEW_LENGTH) {
-            item.attributes.text = `${fullText.slice(0, TEXT_PREVIEW_LENGTH)}... [truncated; call get_notice with this notice's id for full text]`;
+          if (item?.attributes) {
+            const summary = {};
+            for (const field of SUMMARY_FIELDS) {
+              if (field in item.attributes) summary[field] = item.attributes[field];
+            }
+            item.attributes = summary;
           }
         }
       }
