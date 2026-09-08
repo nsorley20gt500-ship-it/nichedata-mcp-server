@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: nichedata-mcp-server
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NICHEDATA_TOKEN
+        sync: false
