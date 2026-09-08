@@ -14,7 +14,7 @@ if (!NICHEDATA_TOKEN) {
 function authHeaders() {
   return {
     Authorization: `Bearer ${NICHEDATA_TOKEN}`,
-    Accept: "application/json",
+    Accept: "application/vnd.api+json",
   };
 }
 
