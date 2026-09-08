@@ -36,7 +36,7 @@ function getServer() {
     async ({ page, limit, sort, filter }) => {
       const url = new URL("/notices", BASE_URL);
       if (page) url.searchParams.set("page", String(page));
-      if (limit) url.searchParams.set("limit", String(limit));
+      if (limit) url.searchParams.set("itemsPerPage", String(limit));
       if (sort) url.searchParams.set("sort", sort);
       if (filter) {
         for (const [key, value] of Object.entries(filter)) {
